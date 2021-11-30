@@ -1,0 +1,45 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'AStarPathPlanning'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=AStarPathPlanning",
+                    "--package=AStarPathPlanning"
+                ],
+                "filter": {
+                    "name": "AStarPathPlanning",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'AStarPathPlanning'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=AStarPathPlanning",
+                    "--package=AStarPathPlanning"
+                ],
+                "filter": {
+                    "name": "AStarPathPlanning",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
