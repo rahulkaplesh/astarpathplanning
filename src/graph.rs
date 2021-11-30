@@ -30,7 +30,16 @@ impl Graph {
         index
     }
 
-    pub fn add_edges(&mut self, source: Rc<Vertex>, target: Rc<Vertex>) {
-        self.edges.push(Edge{source, target});
+    pub fn add_edges(&mut self, source: &Rc<Vertex>, target: &Rc<Vertex>) {
+            let source = Rc::clone(source);
+            let target=Rc::clone(target);
+            self.edges.push(Edge{source, target});
+    }
+
+    pub fn get_vertex(&self, name: &str) -> Option<&Rc<Vertex>> {
+        self.vertices.iter().find(|&vertex| {
+            let Vertex{id, x, y} = &*Rc::clone(vertex);
+            id == name
+        })
     }
 }
