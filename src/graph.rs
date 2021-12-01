@@ -1,16 +1,20 @@
-use std::rc::Rc;
+use core::fmt;
+use std::{rc::Rc, fmt::write};
 
+#[derive(Debug)]
 pub struct Vertex {
     id: String,
     x: f64,
     y: f64
 }
 
+#[derive(Debug)]
 pub struct Edge {
     source: Rc<Vertex>,
     target: Rc<Vertex>,
 }
 
+#[derive(Debug)]
 pub struct Graph {
     vertices: Vec<Rc<Vertex>>,
     edges: Vec<Edge>
