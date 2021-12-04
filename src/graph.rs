@@ -20,6 +20,12 @@ pub struct Graph {
     edges: Vec<Edge>
 }
 
+impl Vertex {
+    pub fn get_id(&self) -> String {
+        self.id.clone()
+    }
+}
+
 impl Graph {
     pub fn new() -> Graph {
         Graph {
@@ -45,5 +51,23 @@ impl Graph {
             let Vertex{id, x, y} = &*Rc::clone(vertex);
             id == name
         })
+    }
+
+    pub fn get_vertex_list(&self) -> Option<Vec<Rc<Vertex>>> {
+        Some(self.vertices.clone())
+    }
+
+    pub fn get_adjacent_vertices_list(&self, vertex: &Rc<Vertex>) -> Option<Vec<Rc<Vertex>>> {
+        let mut vertices = Vec::new();
+        for edge in self.edges.iter() {
+            if edge.source.get_id() == vertex.get_id() {
+                vertices.push(Rc::clone(&edge.target));
+            }
+        }
+        if vertices.len() > 0 {
+            Some(vertices)
+        } else {
+            None
+        }
     }
 }

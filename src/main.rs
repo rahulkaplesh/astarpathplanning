@@ -1,6 +1,7 @@
 use std::rc::Rc;
 
 mod graph;
+mod astar;
 
 fn main() {
     println!("Hello, world!");
@@ -12,5 +13,6 @@ fn main() {
     gs.add_vertex("D", 45.5, 25.5);
     gs.add_edges(&Rc::clone(gs.get_vertex("B").unwrap()), &Rc::clone(gs.get_vertex("C").unwrap()));
     gs.add_edges(&Rc::clone(gs.get_vertex("C").unwrap()), &Rc::clone(gs.get_vertex("D").unwrap()));
+    astar::shortest_path(&gs, "A", "D");
     println!("{:?}",gs);
 }
