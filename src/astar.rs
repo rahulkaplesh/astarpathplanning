@@ -27,11 +27,12 @@ impl PartialOrd for State {
 fn calculate_cost(start: &Vertex, current: &Vertex, target: &Vertex) -> u32 {
     let distance_start_vertex: f64 = f64::sqrt((start.x - current.x).powi(2) + (start.y - current.y).powi(2));
     let distance_target_vertex: f64 = f64::sqrt((target.x - current.x).powi(2) + (target.y - current.y).powi(2));
-    ((distance_start_vertex + distance_target_vertex) * 1000.0).round() as u32
+    ((distance_start_vertex + distance_target_vertex) * 10.0).round() as u32
 }
 
 pub fn shortest_path(operation_graph: &graph::Graph, start_vertex: &str, goal_vertex: &str) {
     let mut dist: HashMap<_, _> = HashMap::new();
+
     if let Some(vertices) = operation_graph.get_vertex_list() {
         for vert in vertices.iter() {
             dist.insert(vert.clone().get_id(), usize::MAX);
@@ -52,6 +53,7 @@ pub fn shortest_path(operation_graph: &graph::Graph, start_vertex: &str, goal_ve
             println!("{:?}",adjacent_vertices);
             for vertex in &adjacent_vertices {
                 let edge_cost = calculate_cost(&Rc::clone(operation_graph.get_vertex(start_vertex).unwrap()), vertex, &Rc::clone(operation_graph.get_vertex(goal_vertex).unwrap()));
+                println!("Move to {} Cost : {}", vertex.get_id(), edge_cost);
                 let next_node = State{ cost: cost + (edge_cost as usize), edge_id: Rc::new(vertex.get_id())};
                 if next_node.cost < *dist.get(&vertex.get_id()).unwrap() {
                     heap.push(next_node);
