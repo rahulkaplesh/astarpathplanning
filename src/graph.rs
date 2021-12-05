@@ -4,8 +4,8 @@ use std::{rc::Rc, fmt::write};
 #[derive(Debug)]
 pub struct Vertex {
     id: String,
-    x: f64,
-    y: f64
+    pub x: f64,
+    pub y: f64
 }
 
 #[derive(Debug)]
