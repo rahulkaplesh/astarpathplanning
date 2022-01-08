@@ -5,41 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "lldb",
+            "name": "(Windows) Launch",
+            "type": "cppvsdbg",
             "request": "launch",
-            "name": "Debug executable 'AStarPathPlanning'",
-            "cargo": {
-                "args": [
-                    "build",
-                    "--bin=AStarPathPlanning",
-                    "--package=AStarPathPlanning"
-                ],
-                "filter": {
-                    "name": "AStarPathPlanning",
-                    "kind": "bin"
-                }
-            },
+            "program": "${workspaceFolder}/target/debug/AStarPathPlanning.exe",
             "args": [],
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug unit tests in executable 'AStarPathPlanning'",
-            "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--bin=AStarPathPlanning",
-                    "--package=AStarPathPlanning"
-                ],
-                "filter": {
-                    "name": "AStarPathPlanning",
-                    "kind": "bin"
-                }
-            },
-            "args": [],
-            "cwd": "${workspaceFolder}"
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "console": "externalTerminal"
         }
     ]
 }

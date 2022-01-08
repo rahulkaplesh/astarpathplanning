@@ -10,6 +10,7 @@ use std::rc::Rc;
 struct State {
     cost: usize,
     edge_id: Rc<String>,
+    route: Vec<Rc<String>>
 }
 
 impl Ord for State {
@@ -41,20 +42,24 @@ pub fn shortest_path(operation_graph: &graph::Graph, start_vertex: &str, goal_ve
     let mut heap = BinaryHeap::new();
 
     dist.insert(start_vertex.to_string(),0 as usize);
-    heap.push(State { cost: 0, edge_id: Rc::new(start_vertex.to_string()) });
+    let route = Vec::new();
+    heap.push(State { cost: 0, edge_id: Rc::new(start_vertex.to_string()), route });
 
-    while let Some(State{ cost, edge_id}) = heap.pop() {
+    while let Some(State{ cost, edge_id, mut route}) = heap.pop() {
         if *edge_id == goal_vertex {
+            route.push(Rc::clone(&edge_id));
             println!("Cost of the entire route : {}", cost);
+            println!("Route is {:?}", route);
             break;
         }
-
+        
         if let Some(adjacent_vertices) = operation_graph.get_adjacent_vertices_list(&Rc::clone(operation_graph.get_vertex(&*&edge_id).unwrap())) {
-            println!("{:?}",adjacent_vertices);
+            println!("Adjacent Vertices : {:?}",adjacent_vertices);
+            route.push(Rc::clone(&edge_id));
             for vertex in &adjacent_vertices {
                 let edge_cost = calculate_cost(&Rc::clone(operation_graph.get_vertex(start_vertex).unwrap()), vertex, &Rc::clone(operation_graph.get_vertex(goal_vertex).unwrap()));
-                println!("Move to {} Cost : {}", vertex.get_id(), edge_cost);
-                let next_node = State{ cost: cost + (edge_cost as usize), edge_id: Rc::new(vertex.get_id())};
+                println!("Move to {} Cost : {}", vertex.get_id(), (cost + edge_cost as usize));
+                let next_node = State{ cost: cost + (edge_cost as usize), edge_id: Rc::new(vertex.get_id()), route: route.clone()};
                 if next_node.cost < *dist.get(&vertex.get_id()).unwrap() {
                     heap.push(next_node);
                     dist.insert(vertex.get_id().to_string(),edge_cost as usize);
