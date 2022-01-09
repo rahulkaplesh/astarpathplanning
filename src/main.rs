@@ -2,10 +2,11 @@ use std::rc::Rc;
 use actix_web::{ HttpServer, App, middleware, web, HttpResponse };
 use json::JsonValue;
 
+mod cost_calculation;
 mod graph;
 mod astar;
 
-/*fn main_not_working() {
+fn test_check() {
     println!("Hello, world!");
     let mut gs = graph::Graph::new();
     gs.add_vertex("A", 0.0, 0.0);
@@ -17,18 +18,25 @@ mod astar;
     gs.add_edges(&Rc::clone(gs.get_vertex("A").unwrap()), &Rc::clone(gs.get_vertex("D").unwrap()));
     gs.add_vertex("E", 1.0, 2.0);
     gs.add_edges(&Rc::clone(gs.get_vertex("D").unwrap()), &Rc::clone(gs.get_vertex("E").unwrap()));
-    astar::shortest_path(&gs, "A", "E");
-}*/
+    astar::shortest_path(&gs, "A", "E", cost_calculation::CostCalculator::SimpleCalculation{});
+}
 
-fn compute_shortest_path(json_struct: JsonValue) {
+fn compute_shortest_path(json_struct: JsonValue) -> JsonValue {
     let mut gs = graph::Graph::new();
     for val in json_struct["points"].members() {
         gs.add_vertex(val["name"].as_str().unwrap(), val["lon"].as_f64().unwrap(), val["lat"].as_f64().unwrap());
     }
-    for val in json_struct["egdes"].members() {
-        gs.add_edges(&Rc::clone(gs.get_vertex(val["source"]["name"].as_str().unwrap()).unwrap()), &Rc::clone(gs.get_vertex(val["target"]["name"].as_str().unwrap()).unwrap()));
+    for val_edges in json_struct["edges"].members() {
+        gs.add_edges(&Rc::clone(gs.get_vertex(val_edges["source"]["name"].as_str().unwrap()).unwrap()), &Rc::clone(gs.get_vertex(val_edges["target"]["name"].as_str().unwrap()).unwrap()));
     }
-
+    let (route, cost) = astar::shortest_path(&gs, json_struct["startPoint"]["name"].as_str().unwrap(), json_struct["endPoint"]["name"].as_str().unwrap(), cost_calculation::CostCalculator::HaversineCalculation{});
+    let mut return_object = JsonValue::new_object();
+    return_object["route"] = JsonValue::new_array();
+    for val in route {
+        return_object["route"].push(val.as_str());
+    }
+    return_object["cost"] = JsonValue::from(cost);
+    return_object
 }
 
 
@@ -38,16 +46,10 @@ async fn get_shortest_distance(body: web::Bytes) -> HttpResponse {
         Ok(val) => val,
         Err(e) => json::object! {"err" => e.to_string() },
     };
-    println!("Points : {:?}", body_json["points"]);
-    println!("First Point : {}", body_json["poi
-    nts"][0]);
-    println!("Edges : {}", body_json["edges"]);
-    println!("Start Point : {}", body_json["startPoint"]);
-    println!("End Point : {}", body_json["endPoint"]);
-    compute_shortest_path(body_json.clone());
+    let ret_json = compute_shortest_path(body_json.clone());
     HttpResponse::Ok()
         .content_type("application/json")
-        .body(body_json.dump()) // <- send response
+        .body(ret_json.dump()) // <- send response
 }
 
 #[actix_web::main]

@@ -1,5 +1,6 @@
 use crate::graph;
 use crate::graph::Vertex;
+use crate::cost_calculation::CostCalculator;
 
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
@@ -31,7 +32,7 @@ fn calculate_cost(start: &Vertex, current: &Vertex, target: &Vertex) -> u32 {
     ((distance_start_vertex + distance_target_vertex) * 10.0).round() as u32
 }
 
-pub fn shortest_path(operation_graph: &graph::Graph, start_vertex: &str, goal_vertex: &str) {
+pub fn shortest_path(operation_graph: &graph::Graph, start_vertex: &str, goal_vertex: &str, cost_calc: CostCalculator) -> (Vec<Rc<String>>, usize) {
     let mut dist: HashMap<_, _> = HashMap::new();
 
     if let Some(vertices) = operation_graph.get_vertex_list() {
@@ -40,6 +41,8 @@ pub fn shortest_path(operation_graph: &graph::Graph, start_vertex: &str, goal_ve
         };
     }
     let mut heap = BinaryHeap::new();
+    let mut overall_cost = 0;
+    let mut final_route = Vec::new();
 
     dist.insert(start_vertex.to_string(),0 as usize);
     let route = Vec::new();
@@ -48,8 +51,8 @@ pub fn shortest_path(operation_graph: &graph::Graph, start_vertex: &str, goal_ve
     while let Some(State{ cost, edge_id, mut route}) = heap.pop() {
         if *edge_id == goal_vertex {
             route.push(Rc::clone(&edge_id));
-            println!("Cost of the entire route : {}", cost);
-            println!("Route is {:?}", route);
+            overall_cost = cost;
+            final_route = route.clone();
             break;
         }
         
@@ -57,7 +60,7 @@ pub fn shortest_path(operation_graph: &graph::Graph, start_vertex: &str, goal_ve
             println!("Adjacent Vertices : {:?}",adjacent_vertices);
             route.push(Rc::clone(&edge_id));
             for vertex in &adjacent_vertices {
-                let edge_cost = calculate_cost(&Rc::clone(operation_graph.get_vertex(start_vertex).unwrap()), vertex, &Rc::clone(operation_graph.get_vertex(goal_vertex).unwrap()));
+                let edge_cost = cost_calc.calculate_cost(&Rc::clone(operation_graph.get_vertex(start_vertex).unwrap()), vertex, &Rc::clone(operation_graph.get_vertex(goal_vertex).unwrap()));
                 println!("Move to {} Cost : {}", vertex.get_id(), (cost + edge_cost as usize));
                 let next_node = State{ cost: cost + (edge_cost as usize), edge_id: Rc::new(vertex.get_id()), route: route.clone()};
                 if next_node.cost < *dist.get(&vertex.get_id()).unwrap() {
@@ -66,6 +69,6 @@ pub fn shortest_path(operation_graph: &graph::Graph, start_vertex: &str, goal_ve
                 }
             }
         }
-        //TODO ! Further implementation to be completed ! Calculating cost and adding to heap 
     }
+    (final_route, overall_cost)
 }
