@@ -1,5 +1,6 @@
-//use std::rc::Rc;
+use std::rc::Rc;
 use actix_web::{ HttpServer, App, middleware, web, HttpResponse };
+use json::JsonValue;
 
 mod graph;
 mod astar;
@@ -19,10 +20,34 @@ mod astar;
     astar::shortest_path(&gs, "A", "E");
 }*/
 
+fn compute_shortest_path(json_struct: JsonValue) {
+    let mut gs = graph::Graph::new();
+    for val in json_struct["points"].members() {
+        gs.add_vertex(val["name"].as_str().unwrap(), val["lon"].as_f64().unwrap(), val["lat"].as_f64().unwrap());
+    }
+    for val in json_struct["egdes"].members() {
+        gs.add_edges(&Rc::clone(gs.get_vertex(val["source"]["name"].as_str().unwrap()).unwrap()), &Rc::clone(gs.get_vertex(val["target"]["name"].as_str().unwrap()).unwrap()));
+    }
+
+}
+
+
 /// This handler uses json extractor
-async fn get_shortest_distance() -> HttpResponse {
-    println!("I got Request!!");
-    HttpResponse::Ok().json({}) // <- send response
+async fn get_shortest_distance(body: web::Bytes) -> HttpResponse {
+    let body_json: JsonValue = match json::parse(std::str::from_utf8(&body).unwrap()) {
+        Ok(val) => val,
+        Err(e) => json::object! {"err" => e.to_string() },
+    };
+    println!("Points : {:?}", body_json["points"]);
+    println!("First Point : {}", body_json["poi
+    nts"][0]);
+    println!("Edges : {}", body_json["edges"]);
+    println!("Start Point : {}", body_json["startPoint"]);
+    println!("End Point : {}", body_json["endPoint"]);
+    compute_shortest_path(body_json.clone());
+    HttpResponse::Ok()
+        .content_type("application/json")
+        .body(body_json.dump()) // <- send response
 }
 
 #[actix_web::main]
