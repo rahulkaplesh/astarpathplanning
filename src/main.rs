@@ -1,6 +1,7 @@
 use std::rc::Rc;
 use actix_web::{ HttpServer, App, middleware, web, HttpResponse };
 use json::JsonValue;
+use actix_cors::Cors;
 
 mod cost_calculation;
 mod graph;
@@ -60,6 +61,9 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             // enable logger
+            .wrap(
+                Cors::default()
+            )
             .wrap(middleware::Logger::default())
             .data(web::JsonConfig::default().limit(4096)) // <- limit size of the payload (global configuration)
             .service(web::resource("/get-shortest-path").route(web::post().to(get_shortest_distance)))
