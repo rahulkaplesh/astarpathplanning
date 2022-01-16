@@ -1,6 +1,7 @@
 use crate::graph;
 use crate::graph::Vertex;
 use crate::cost_calculation::CostCalculator;
+use crate::cost_calculation::CostCalculation;
 
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
@@ -32,7 +33,7 @@ fn calculate_cost(start: &Vertex, current: &Vertex, target: &Vertex) -> u32 {
     ((distance_start_vertex + distance_target_vertex) * 10.0).round() as u32
 }
 
-pub fn shortest_path(operation_graph: &graph::Graph, start_vertex: &str, goal_vertex: &str, cost_calc: CostCalculator) -> (Vec<Rc<String>>, usize) {
+pub fn shortest_path(operation_graph: &graph::Graph, start_vertex: &str, goal_vertex: &str, cost_calc: Box<dyn CostCalculation>) -> (Vec<Rc<String>>, usize) {
     let mut dist: HashMap<_, _> = HashMap::new();
 
     if let Some(vertices) = operation_graph.get_vertex_list() {
