@@ -23,6 +23,7 @@ fn test_check() {
 }
 
 fn compute_shortest_path(json_struct: JsonValue) -> JsonValue {
+    let simnumber = json_struct["simnumber"].as_number().unwrap();
     let mut gs = graph::Graph::new();
     for val in json_struct["points"].members() {
         gs.add_vertex(val["name"].as_str().unwrap(), val["lon"].as_f64().unwrap(), val["lat"].as_f64().unwrap());
@@ -38,6 +39,7 @@ fn compute_shortest_path(json_struct: JsonValue) -> JsonValue {
         return_object["route"].push(val.as_str());
     }
     return_object["cost"] = JsonValue::from(cost);
+    return_object["simnumber"] = JsonValue::from(simnumber);
     return_object
 }
 
